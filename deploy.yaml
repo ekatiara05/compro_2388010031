@@ -7,6 +7,7 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    # Menambahkan instruksi untuk menghilangkan warning Node.js 20
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
@@ -17,7 +18,7 @@ jobs:
       uses: docker/login-action@v3
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }} # Gunakan token dckr_pat...
 
     - name: Build and push Docker image
       uses: docker/build-push-action@v5
@@ -29,19 +30,20 @@ jobs:
   deploy:
     needs: build-and-deploy
     runs-on: ubuntu-latest
+    name: Deploy to EC2 via SSH and run docker
     steps:
     - name: SSH and deploy
       uses: appleboy/ssh-action@v1.0.3
       with:
-        host: ${{ secrets.AWS_HOST }}
+        host: ${{ secrets.AWS_HOST }} # Pastikan IP adalah 13.221.56.107
         username: ${{ secrets.AWS_USERNAME }}
         key: ${{ secrets.AWS_PRIVATE_KEY }}
         port: 22
         script: |
-          # Pastikan menghapus container lama dengan nama yang benar
+          # Menghapus container lama agar desain biru hilang
           docker stop compro_2388010031 || true
           docker rm compro_2388010031 || true
-          # Ambil desain baru dari Docker Hub
+          # Menarik image terbaru dari akun ekatiara
           docker pull ${{ secrets.DOCKERHUB_USERNAME }}/compro_2388010031:latest
-          # Jalankan website merah marun Eka Tiara
+          # Menjalankan desain baru merah marun
           docker run -d --name compro_2388010031 -p 80:80 ${{ secrets.DOCKERHUB_USERNAME }}/compro_2388010031:latest
