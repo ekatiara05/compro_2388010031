@@ -30,7 +30,7 @@ services:
       DB_NAME: dbcompro
       DB_HOST: db-webdinamis
       NEXTAUTH_SECRET: Eka-Tiara-2388010031
-      NEXTAUTH_URL: http://13.211.130.82:3000
+      NEXTAUTH_URL: http://3.107.205.166:3000
     depends_on:
       - db-webdinamis
 
